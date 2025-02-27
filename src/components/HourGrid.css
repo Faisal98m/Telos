@@ -1,0 +1,42 @@
+.hour-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.grid-cell {
+  aspect-ratio: 1;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.grid-cell.completed {
+  background-color: #4caf50;
+  color: white;
+}
+
+.grid-cell:hover {
+  transform: scale(1.05);
+}
+
+.grid-cell.has-notes {
+  position: relative;
+}
+
+.note-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 12px;
+}
+
+.cell-number {
+  position: relative;
+  z-index: 1;
+} 
