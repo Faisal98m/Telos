@@ -1,42 +1,152 @@
-.hour-grid {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 4px;
-  max-width: 600px;
-  margin: 20px auto;
+.hour-grid-container {
+  width: 100%;
+  min-height: calc(100vh - 200px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.grid-cell {
+/* Decades view */
+.decades-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 30px;
+  padding: 40px 20px;
+  width: 100%;
+  max-width: 1200px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  perspective: 1000px;
+}
+
+.decade-block {
+  flex: 0 0 400px;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  scroll-snap-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.decade-block:hover {
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+/* Century grid view */
+.century-grid-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+}
+
+.grid-title {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.century-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
   aspect-ratio: 1;
-  border: 1px solid #ccc;
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.century-cell {
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
+  user-select: none;
 }
 
-.grid-cell.completed {
-  background-color: #4caf50;
+.century-cell.completed {
+  background: #4caf50;
   color: white;
 }
 
-.grid-cell:hover {
-  transform: scale(1.05);
+.century-cell:hover {
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.grid-cell.has-notes {
-  position: relative;
-}
-
-.note-indicator {
+/* Common elements */
+.back-button {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  font-size: 12px;
+  top: -50px;
+  left: 0;
+  padding: 12px 24px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.cell-number {
-  position: relative;
-  z-index: 1;
-} 
+.back-button:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar {
+  width: 80%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 10px auto;
+}
+
+.progress {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .decade-block {
+    flex: 0 0 300px;
+    height: 250px;
+  }
+
+  .century-grid {
+    gap: 3px;
+    padding: 10px;
+  }
+
+  .century-cell {
+    font-size: 12px;
+  }
+
+  .grid-title {
+    font-size: 20px;
+  }
+}
