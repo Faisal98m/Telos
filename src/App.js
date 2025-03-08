@@ -1,67 +1,116 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Timer from './components/Timer';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout'; // New layout component
+import Dashboard from './components/Dashboard'; // New dashboard component
 import Notes from './components/Notes';
+import { db } from './config/firebase';
+import { doc, updateDoc, onSnapshot, getDoc, setDoc } from 'firebase/firestore';
 import './App.css';
 
-// Wrapper component to use hooks
-const AppContent = () => {
+function App() {
   const testProjectId = 'test-project-1';
   const testUserId = 'test-user-1';
-  const [completedHours, setCompletedHours] = useState(5);
-  const [expandedBlock, setExpandedBlock] = useState(null);
+  const [completedHours, setCompletedHours] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(3600000000); // 1000 hours in ms
 
-  const handleBlockClick = (blockId) => {
-    setExpandedBlock(blockId);
-  };
+  // Sync timer state with Firestore
+  useEffect(() => {
+    const projectRef = doc(db, 'users', testUserId, 'projects', testProjectId);
 
-  const handleBackToOverview = () => {
-    setExpandedBlock(null);
-  };
+    // Load initial data
+    const loadData = async () => {
+      const docSnap = await getDoc(projectRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCompletedHours(data.completedHours || 0);
+        setIsRunning(data.isRunning || false);
+        setTimeRemaining(
+          data.timeRemaining ||
+            Math.max(0, 3600000000 - (data.completedHours * 3600000))
+        );
+      } else {
+        // Initialize if project doesn't exist
+        await setDoc(projectRef, {
+          completedHours: 0,
+          isRunning: false,
+          timeRemaining: 3600000000, // 1000 hours in ms
+        });
+      }
+    };
+    loadData();
+
+    // Real-time listener with debugging
+    const unsubscribe = onSnapshot(projectRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        console.log(
+          'Firestore update - completedHours:',
+          data.completedHours,
+          'isRunning:',
+          data.isRunning,
+          'timeRemaining:',
+          data.timeRemaining
+        );
+        setCompletedHours(data.completedHours || 0);
+        setIsRunning(data.isRunning || false);
+        setTimeRemaining(
+          Math.max(
+            0,
+            data.timeRemaining ||
+              3600000000 - (data.completedHours * 3600000)
+          )
+        );
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription
+  }, [testUserId, testProjectId]);
 
   const handleCompleteHour = () => {
-    setCompletedHours(prev => Math.min(prev + 1, 1000));
+    const projectRef = doc(db, 'users', testUserId, 'projects', testProjectId);
+    const newCompletedHours = completedHours + 1;
+    const newTimeRemaining = Math.max(
+      0,
+      3600000000 - newCompletedHours * 3600000
+    );
+    updateDoc(projectRef, {
+      completedHours: newCompletedHours,
+      timeRemaining: newTimeRemaining,
+      isRunning: false, // Stop timer after completing an hour
+    });
+  };
+
+  const handleTimerToggle = (newIsRunning) => {
+    const projectRef = doc(db, 'users', testUserId, 'projects', testProjectId);
+    updateDoc(projectRef, {
+      isRunning: newIsRunning,
+      timeRemaining: timeRemaining, // Sync current timeRemaining
+    });
   };
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>1000 Hours to Mastery</h1>
-      </header>
-      <main>
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <Timer 
-                projectId={testProjectId} 
-                userId={testUserId}
-                completedHours={completedHours}
-                setCompletedHours={setCompletedHours}
-                expandedBlock={expandedBlock}
-                onBlockClick={handleBlockClick}
-                onBack={handleBackToOverview}
-                onCompleteHour={handleCompleteHour}
-              />
-            } 
-          />
-          <Route 
-            path="/notes/:hourIndex" 
-            element={<Notes projectId={testProjectId} />} 
-          />
-        </Routes>
-      </main>
-    </div>
-  );
-};
-
-// Main App component with Router
-function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
+    <Layout
+      projectId={testProjectId}
+      userId={testUserId}
+      completedHours={completedHours}
+      setCompletedHours={setCompletedHours}
+      isRunning={isRunning}
+      setIsRunning={setIsRunning}
+      timeRemaining={timeRemaining}
+      setTimeRemaining={setTimeRemaining}
+      onCompleteHour={handleCompleteHour}
+      onTimerToggle={handleTimerToggle}
+    >
+      <Routes>
+        <Route path="/" element={<Dashboard completedHours={completedHours} />} />
+        <Route
+          path="/notes/:hourIndex"
+          element={<Notes projectId={testProjectId} userId={testUserId} />}
+        />
+      </Routes>
+    </Layout>
   );
 }
 
-export default App; 
+export default App;

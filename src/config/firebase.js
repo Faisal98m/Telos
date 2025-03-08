@@ -4,12 +4,12 @@ import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   // Replace with your Firebase config
-  apiKey: "your-api-key",
-  authDomain: "your-auth-domain",
-  projectId: "your-project-id",
-  storageBucket: "your-storage-bucket",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id"
+  apiKey: "AIzaSyDPMykuvFj0xsWf2m4_3TOWgG7HswVaKIg",
+  authDomain: "masteryproject-b6ec2.firebaseapp.com",
+  projectId: "masteryproject-b6ec2",
+  storageBucket: "masteryproject-b6ec2.firebasestorage.app",
+  messagingSenderId: "330510383061",
+  appId: "1:330510383061:web:6a78e6076136306bdd2f5c"
 };
 
 const app = initializeApp(firebaseConfig);

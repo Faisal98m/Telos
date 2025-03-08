@@ -1,78 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../config/firebase';
-import { doc, updateDoc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
+import React, { useEffect } from 'react';
+import { db, doc, updateDoc } from '../config/firebase'; // Imports should now work
 import CircularProgress from './CircularProgress';
-import HourGrid from './HourGrid';
 import { formatTime } from '../utils/timeUtils';
 import './Timer.css';
 
-const Timer = ({ 
-  projectId, 
-  userId, 
-  completedHours, 
-  setCompletedHours, 
-  expandedBlock, 
-  onBlockClick, 
-  onBack, 
-  onCompleteHour 
+const Timer = ({
+  projectId,
+  userId,
+  completedHours,
+  setCompletedHours,
+  isRunning,
+  setIsRunning,
+  timeRemaining,
+  setTimeRemaining,
+  onCompleteHour,
+  onTimerToggle,
 }) => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(3600000); // 1 hour in ms
-
   // Timer logic
   useEffect(() => {
     let interval;
     if (isRunning) {
       interval = setInterval(() => {
-        setTimeRemaining(prev => {
+        setTimeRemaining((prev) => {
           if (prev <= 0) {
             setIsRunning(false);
+            const newHours = completedHours + 1;
             onCompleteHour();
-            return 3600000; // Reset to 1 hour
+            console.log('Timer completed hour, new completedHours:', newHours);
+            return Math.max(0, 3600000000 - (newHours * 3600000));
           }
-          return prev - 1000;
+          const newTime = prev - 1000;
+          return newTime;
         });
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isRunning, onCompleteHour]);
+  }, [isRunning, completedHours, onCompleteHour, setTimeRemaining, setIsRunning]);
+
+  // Batch Firestore updates
+  useEffect(() => {
+    let firestoreInterval;
+    if (isRunning) {
+      firestoreInterval = setInterval(() => {
+        const projectRef = doc(db, 'users', userId, 'projects', projectId);
+        updateDoc(projectRef, { timeRemaining, isRunning: true }).catch(
+          (err) => console.error('Firestore update failed:', err)
+        );
+      }, 10000);
+    }
+    return () => clearInterval(firestoreInterval);
+  }, [isRunning, timeRemaining, userId, projectId]);
+
+  const handleToggleTimer = () => {
+    const newIsRunning = !isRunning;
+    setIsRunning(newIsRunning);
+    onTimerToggle(newIsRunning);
+  };
+
+  console.log(
+    'Timer rendering with isRunning:',
+    isRunning,
+    'timeRemaining:',
+    timeRemaining,
+    'completedHours:',
+    completedHours
+  );
 
   return (
     <div className="timer-container">
-      {/* Progress Circle */}
       <CircularProgress progress={(completedHours / 1000) * 100} />
-
-      {/* Timer Display */}
-      <div className="time-display">
-        {formatTime(timeRemaining)}
-      </div>
-
-      {/* Controls */}
+      <div className="time-display">{formatTime(timeRemaining)}</div>
       <div className="controls">
-        <button 
-          className="timer-button"
-          onClick={() => setIsRunning(!isRunning)}
-        >
+        <button className="timer-button" onClick={handleToggleTimer}>
           {isRunning ? 'Pause' : 'Start'}
         </button>
-        
-        <button 
-          className="timer-button"
-          onClick={onCompleteHour}
-        >
+        <button className="timer-button" onClick={onCompleteHour}>
           Complete Hour (Test)
         </button>
       </div>
-
-      {/* Hour Grid */}
-      <HourGrid 
-        completedHours={completedHours}
-        expandedBlock={expandedBlock}
-        onBlockClick={onBlockClick}
-        onBack={onBack}
-      />
     </div>
   );
 };
 
-export default Timer; 
+export default Timer;

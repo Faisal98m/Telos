@@ -1,12 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './HourGrid.css';
 
-const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
-  const navigate = useNavigate();
+const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack, onNavigateToNotes }) => {
   const scrollRef = useRef(null);
 
-  // Unsplash images for each decade (100 hours)
+  // Unsplash image IDs for each decade
   const decadeImages = [
     '1506748686214-e9df14d4d9d0', // 0-99
     '1517021897933-0e0319cfbc28', // 100-199
@@ -62,7 +60,9 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
           className="decade-block"
           style={{
             backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
-              url(https://images.unsplash.com/photo-${decadeImages[decadeIndex]}?auto=format&fit=crop&w=800&q=80)`
+              url(https://images.unsplash.com/photo-${decadeImages[decadeIndex]}?auto=format&fit=crop&w=400&h=300&q=80)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
           }}
           onClick={() => onBlockClick(decadeIndex)}
         >
@@ -87,7 +87,8 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
 
   const renderCenturyGrid = (decadeIndex) => {
     const startHour = decadeIndex * 100;
-    
+    console.log('Rendering century grid for decade', decadeIndex, 'with completedHours:', completedHours);
+
     return (
       <div className="century-grid-container">
         <button className="back-button" onClick={onBack}>
@@ -100,11 +101,17 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
           {Array(100).fill(0).map((_, i) => {
             const hour = startHour + i;
             const isCompleted = hour < completedHours;
+            console.log(`Hour ${hour} isCompleted: ${isCompleted}`);
             return (
               <div
                 key={i}
                 className={`century-cell ${isCompleted ? 'completed' : ''}`}
-                onClick={() => isCompleted && navigate(`/notes/${hour}`)}
+                onClick={() => {
+                  if (isCompleted) {
+                    onNavigateToNotes(hour);
+                    console.log(`Navigating to notes for hour ${hour}`);
+                  }
+                }}
               >
                 {hour}
               </div>
@@ -115,6 +122,8 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
     );
   };
 
+  console.log('HourGrid rendering with completedHours:', completedHours, 'expandedBlock:', expandedBlock);
+
   return (
     <div className="hour-grid-container">
       {expandedBlock === null ? (
@@ -124,8 +133,11 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack }) => {
       ) : (
         renderCenturyGrid(expandedBlock)
       )}
+      
     </div>
+    
   );
 };
 
-export default HourGrid; 
+
+export default HourGrid;

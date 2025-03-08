@@ -1,0 +1,38 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .timer-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f5f5f5;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    z-index: 1000; /* Ensure it stays on top */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .timer-header h1 {
+    margin: 0;
+    color: #333;
+    font-size: 2rem;
+  }
+  
+  main {
+    margin-top: 150px; /* Adjust based on header height */
+    flex: 1;
+    padding: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
