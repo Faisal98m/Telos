@@ -16,12 +16,12 @@
 .progress-ring__circle {
   stroke-linecap: round;
   transition: stroke-dasharray 0.3s ease, stroke-width 0.5s ease, opacity 0.5s ease;
-  box-shadow: 0 0 15px rgba(76, 175, 80, 0.8), 0 0 30px rgba(33, 150, 243, 0.6); /* Neon-like glow */
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.8), 0 0 30px rgba(33, 150, 243, 0.6);
 }
 
 .progress-ring__circle.animate {
-  stroke-width: 16; /* Pulse effect: widen stroke */
-  opacity: 0.9; /* Slightly fade for animation */
+  stroke-width: 16;
+  opacity: 0.9;
   animation: pulse 1.5s ease-out;
 }
 
@@ -48,28 +48,25 @@
 .progress-text {
   font-size: 24px;
   font-weight: bold;
-  fill: #FFD700; /* Vibrant gold color */
+  fill: #8d1000;
   dominant-baseline: middle;
   text-anchor: middle;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6); /* Gold glow */
-  outline: 1px solid rgba(255, 215, 0, 0.5); /* Subtle outline for visibility */
+  text-shadow: 0 0 10px rgba(6, 6, 5, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+  outline: 1px solid rgba(27, 26, 20, 0.5);
   background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0) 70%);
   padding: 5px;
   border-radius: 50%;
-  transform: none; /* Ensure no rotation on text */
+  transform: none;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .circular-progress {
     width: 150px;
     height: 150px;
   }
-
   .progress-ring__circle {
     stroke-width: 10;
   }
-
   .progress-text {
     font-size: 18px;
   }

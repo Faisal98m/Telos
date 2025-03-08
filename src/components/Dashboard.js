@@ -6,26 +6,20 @@ const Dashboard = ({ completedHours }) => {
   const navigate = useNavigate();
   const [expandedBlock, setExpandedBlock] = useState(null);
 
-  const handleBlockClick = (blockId) => {
-    setExpandedBlock(blockId);
-  };
-
-  const handleBack = () => {
-    setExpandedBlock(null);
-  };
-
-  const handleNavigateToNotes = (hour) => {
-    navigate(`/notes/${hour}`);
-  };
+  const handleBlockClick = (blockId) => setExpandedBlock(blockId);
+  const handleBack = () => setExpandedBlock(null);
+  const handleNavigateToNotes = (hour) => navigate(`/notes/${hour}`);
 
   return (
-    <HourGrid
-      completedHours={completedHours}
-      expandedBlock={expandedBlock}
-      onBlockClick={handleBlockClick}
-      onBack={handleBack}
-      onNavigateToNotes={handleNavigateToNotes}
-    />
+    <div className="dashboard-container">
+      <HourGrid
+        completedHours={completedHours}
+        expandedBlock={expandedBlock}
+        onBlockClick={handleBlockClick}
+        onBack={handleBack}
+        onNavigateToNotes={handleNavigateToNotes}
+      />
+    </div>
   );
 };
 

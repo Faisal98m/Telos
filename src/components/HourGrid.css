@@ -1,13 +1,12 @@
 .hour-grid-container {
   width: 100%;
-  min-height: calc(100vh - 200px);
+  min-height: 100%;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Decades view */
 .decades-scroll {
   display: flex;
   overflow-x: auto;
@@ -27,20 +26,18 @@
   background-size: cover;
   background-position: center;
   border-radius: 16px;
-  position: relative;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   scroll-snap-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .decade-block:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   z-index: 2;
 }
 
-/* Century grid view */
 .century-grid-container {
   width: 100%;
   max-width: 600px;
@@ -68,7 +65,6 @@
 }
 
 .century-cell {
-  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,13 +88,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Common elements */
 .back-button {
-  position: absolute;
-  top: -50px;
-  left: 0;
   padding: 12px 24px;
-  background: #2196F3;
+  background: #2196f3;
   color: white;
   border: none;
   border-radius: 8px;
@@ -107,10 +99,11 @@
   font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
 }
 
 .back-button:hover {
-  background: #1976D2;
+  background: #1976d2;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -130,22 +123,18 @@
   transition: width 0.3s ease;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .decade-block {
     flex: 0 0 300px;
     height: 250px;
   }
-
   .century-grid {
     gap: 3px;
     padding: 10px;
   }
-
   .century-cell {
     font-size: 12px;
   }
-
   .grid-title {
     font-size: 20px;
   }

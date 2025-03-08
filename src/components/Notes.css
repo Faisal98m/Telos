@@ -1,51 +1,52 @@
 .notes-container {
-  max-width: 800px; /* Set a maximum width for the container */
-  margin: 0 auto; /* Center the container horizontally */
-  padding: 20px; /* Add some padding around the container */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .notes-textarea {
-  width: 100%; /* Make the textarea take the full width of the container */
-  height: 400px; /* Set a large height for the textarea */
-  padding: 15px; /* Add padding inside the textarea for better text readability */
-  font-size: 16px; /* Set a comfortable font size */
-  line-height: 1.5; /* Improve readability with a good line height */
-  border: 1px solid #ccc; /* Add a border around the textarea */
-  border-radius: 8px; /* Round the corners of the textarea */
-  resize: vertical; /* Allow vertical resizing only */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  width: 100%;
+  height: 400px;
+  padding: 15px;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  box-sizing: border-box;
 }
 
 .notes-actions {
-  display: flex; /* Use flexbox for layout */
-  justify-content: space-between; /* Space out the buttons */
-  margin-top: 20px; /* Add some space above the buttons */
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
-.save-button, .cancel-button {
-  padding: 10px 20px; /* Add padding to the buttons */
-  font-size: 16px; /* Set a comfortable font size for the buttons */
-  border: none; /* Remove default border */
-  border-radius: 5px; /* Round the corners of the buttons */
-  cursor: pointer; /* Change cursor to pointer on hover */
-  transition: background-color 0.3s ease; /* Smooth transition for background color */
+.save-button,
+.cancel-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .save-button {
-  background-color: #4caf50; /* Green background for save button */
-  color: white; /* White text color */
+  background-color: #4caf50;
+  color: white;
 }
 
 .save-button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
 }
 
 .cancel-button {
-  background-color: #f44336; /* Red background for cancel button */
-  color: white; /* White text color */
+  background-color: #f44336;
+  color: white;
 }
 
 .cancel-button:hover {
-  background-color: #e53935; /* Darker red on hover */
+  background-color: #e53935;
 }

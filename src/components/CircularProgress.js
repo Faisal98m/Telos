@@ -7,8 +7,7 @@ const CircularProgress = ({ progress }) => {
 
   useEffect(() => {
     setIsAnimating(true);
-    const timeout = setTimeout(() => setIsAnimating(false), 1500); // Animation lasts 1.5s
-    // Generate random sparkles along the progress path
+    const timeout = setTimeout(() => setIsAnimating(false), 1500);
     const newSparkles = Array.from({ length: 5 }, () => ({
       id: Math.random(),
       offset: Math.random() * progress,
@@ -36,13 +35,26 @@ const CircularProgress = ({ progress }) => {
           r="80"
           cx="100"
           cy="100"
-          style={{ strokeDasharray: `${progress}, 100`, animation: 'rotate 8s linear infinite' }}
+          style={{
+            strokeDasharray: `${progress}, 100`,
+            animation: 'rotate 8s linear infinite',
+          }}
         />
-        {sparkles.map(sparkle => (
+        {sparkles.map((sparkle) => (
           <circle
             key={sparkle.id}
-            cx={100 + Math.cos(sparkle.angle * Math.PI / 180) * 80 * (sparkle.offset / 100)}
-            cy={100 - Math.sin(sparkle.angle * Math.PI / 180) * 80 * (sparkle.offset / 100)}
+            cx={
+              100 +
+              Math.cos((sparkle.angle * Math.PI) / 180) *
+                80 *
+                (sparkle.offset / 100)
+            }
+            cy={
+              100 -
+              Math.sin((sparkle.angle * Math.PI) / 180) *
+                80 *
+                (sparkle.offset / 100)
+            }
             r="2"
             fill="white"
             className="sparkle"

@@ -4,35 +4,43 @@
     min-height: 100vh;
   }
   
-  .timer-header {
-    position: fixed;
+  /* The magic is position: sticky; top: 0; 
+     This means the header scrolls with the page 
+     until it reaches the top, then it sticks. */
+  .sticky-header {
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
+    z-index: 1000;
+  
     background-color: #f5f5f5;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-    z-index: 1000; /* Ensure it stays on top */
+    padding: 20px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
   }
   
-  .timer-header h1 {
+  /* The header will grow/shrink based on Timer size, 
+     no forced height needed */
+  .sticky-header h1 {
     margin: 0;
-    color: #333;
     font-size: 2rem;
+    color: #333;
   }
   
   main {
-    margin-top: 150px; /* Adjust based on header height */
-    flex: 1;
+    /* No big margin-top needed, because sticky elements 
+       remain in normal flow until they hit the top */
     padding: 20px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
+    max-width: 1200px;
+    margin: 0 auto;
+  
+    background-color: #fff;
     border-radius: 10px;
+    border-top: 2px solid #ddd; /* optional boundary line */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
+  
