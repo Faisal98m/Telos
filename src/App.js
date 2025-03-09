@@ -16,8 +16,6 @@ function App() {
     console.log('Added new project:', newProject);
   };
 
-  console.log('Rendering App with projects:', projects);
-
   return (
     <div className="app">
       <header className="app-header">
@@ -26,7 +24,7 @@ function App() {
       </header>
       <main>
         <Routes>
-          {/* Redirect root path to the first project or a default page */}
+          {/* Redirect root to the first project */}
           <Route path="/" element={<Navigate to={`/${projects[0].id}`} />} />
           {projects.map(project => (
             <Route 
@@ -36,6 +34,7 @@ function App() {
             />
           ))}
           <Route path="/notes/:hourIndex" element={<Notes projectId="project-1" userId="test-user-1" />} />
+          <Route path="*" element={<div>404: Page Not Found</div>} />
         </Routes>
       </main>
     </div>
