@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import './HourGrid.css';
 
-const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack, onNavigateToNotes }) => {
+const HourGrid = ({ projectId, completedHours, expandedBlock, onBlockClick, onBack, onNavigateToNotes }) => {
   const scrollRef = useRef(null);
 
   // Unsplash image IDs for each decade
@@ -86,13 +86,19 @@ const HourGrid = ({ completedHours, expandedBlock, onBlockClick, onBack, onNavig
             .map((_, i) => {
               const hour = startHour + i;
               const isCompleted = hour < completedHours;
+              const isFirstHour = hour === 0;
+              const cellClass = `century-cell ${isCompleted ? 'completed' : ''} ${isFirstHour ? 'first-hour' : ''}`;
+              
               return (
                 <div
                   key={i}
-                  className={`century-cell ${isCompleted ? 'completed' : ''}`}
-                  onClick={() => { if (isCompleted) onNavigateToNotes(hour); }}
+                  className={cellClass}
+                  onClick={() => {
+                    if (isCompleted || isFirstHour) onNavigateToNotes(projectId, hour);
+                  }}
                 >
                   {hour}
+                  {isFirstHour && <div className="edit-indicator">✎</div>}
                 </div>
               );
             })}

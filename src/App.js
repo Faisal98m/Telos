@@ -1,43 +1,70 @@
-import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { db } from './config/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { SessionProvider } from './context/SessionContext';
+import { initializeUserData } from './utils/firebaseInit';
+import Header from './components/Header';
+import Dashboard from './components/Dashboard';
 import Telos from './components/Telos';
 import Notes from './components/Notes';
+import TimerPage from './pages/Timer';
 import './App.css';
 
 function App() {
-  const [projects, setProjects] = useState([
-    { id: 'project-1', name: 'Programming' },
-    { id: 'project-2', name: 'Guitar' }
-  ]);
+  useEffect(() => {
+    const checkFirebaseConnection = async () => {
+      try {
+        console.log('App: Checking Firebase connection...');
+        // Try to read from Firestore to verify connection
+        const testRef = collection(db, 'test');
+        await getDocs(testRef);
+        console.log('App: Firebase connection successful');
 
-  const addProject = (name) => {
-    const newProject = { id: `project-${projects.length + 1}`, name };
-    setProjects([...projects, newProject]);
-    console.log('Added new project:', newProject);
-  };
+        // Initialize user data
+        console.log('App: Initializing user data...');
+        await initializeUserData();
+        console.log('App: User data initialized');
+      } catch (error) {
+        console.error('App: Firebase connection error:', error);
+      }
+    };
+
+    checkFirebaseConnection();
+  }, []);
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Telos Mastery</h1>
-        <button onClick={() => addProject('New Project')}>Add Telos</button>
-      </header>
-      <main>
-        <Routes>
-          {/* Redirect root to the first project */}
-          <Route path="/" element={<Navigate to={`/${projects[0].id}`} />} />
-          {projects.map(project => (
+    <SessionProvider>
+      <div className="app">
+        <Header />
+        <main>
+          <Routes>
             <Route 
-              key={project.id} 
-              path={`/${project.id}`} 
-              element={<Telos projectId={project.id} userId="test-user-1" />} 
+              path="/" 
+              element={<Dashboard />} 
             />
-          ))}
-          <Route path="/notes/:hourIndex" element={<Notes projectId="project-1" userId="test-user-1" />} />
-          <Route path="*" element={<div>404: Page Not Found</div>} />
-        </Routes>
-      </main>
-    </div>
+            <Route 
+              path="/timer" 
+              element={<TimerPage />} 
+            />
+            <Route 
+              path="/telos/:projectId" 
+              element={<Telos userId="test-user-1" />} 
+            />
+            <Route 
+              path="/notes/:projectId/:hourIndex" 
+              element={<Notes userId="test-user-1" />} 
+            />
+            <Route 
+              path="*" 
+              element={
+                <div className="error-message">404: Page Not Found</div>
+              } 
+            />
+          </Routes>
+        </main>
+      </div>
+    </SessionProvider>
   );
 }
 

@@ -5,17 +5,14 @@ import { db } from '../config/firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import './Notes.css';
 
-const Notes = ({ projectId, userId }) => {
-  const { hourIndex } = useParams();
+const Notes = ({ userId }) => {
+  const { hourIndex, projectId } = useParams();
   const navigate = useNavigate();
   const [note, setNote] = useState('');
 
-  // Only render if hourIndex exists
-  if (!hourIndex) {
-    return null;
-  }
-
   useEffect(() => {
+    if (!hourIndex || !projectId) return;
+    
     const notesRef = doc(db, 'users', userId, 'projects', projectId, 'notes', hourIndex);
     
     const loadNote = async () => {
@@ -30,7 +27,7 @@ const Notes = ({ projectId, userId }) => {
 
     const unsubscribe = onSnapshot(notesRef, (doc) => {
       if (doc.exists()) {
-        console.log(`Notes update for hour ${hourIndex}:`, doc.data().text);
+        console.log(`Notes update for hour ${hourIndex} in project ${projectId}:`, doc.data().text);
         setNote(doc.data().text || '');
       }
     });
@@ -39,10 +36,28 @@ const Notes = ({ projectId, userId }) => {
   }, [hourIndex, projectId, userId]);
 
   const saveNote = async () => {
+    if (!projectId) {
+      console.error('No project ID provided');
+      return;
+    }
     const notesRef = doc(db, 'users', userId, 'projects', projectId, 'notes', hourIndex);
     await setDoc(notesRef, { text: note }, { merge: true });
-    console.log(`Saved note for hour ${hourIndex}:`, note);
+    console.log(`Saved note for hour ${hourIndex} in project ${projectId}:`, note);
+    navigate(-1);
   };
+
+  if (!hourIndex || !projectId) {
+    return (
+      <div className="notes-container">
+        <div className="error-message">
+          Invalid hour or project reference. Please try again.
+        </div>
+        <button onClick={() => navigate('/')} className="cancel-button">
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="notes-container">
