@@ -1,14 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSession } from '../context/SessionContext';
 import Timer from '../components/Timer';
 import './Timer.css';
 
 const TimerPage = () => {
   const navigate = useNavigate();
-  const { activeSession, endSession } = useSession();
+  const { projectId } = useParams();
+  const { sessions, endSession } = useSession();
 
-  if (!activeSession) {
+  const session = sessions[projectId];
+  if (!session) {
     return (
       <div className="timer-page empty-state">
         <h2>No Active Session</h2>
@@ -24,7 +26,7 @@ const TimerPage = () => {
   }
 
   const handleEndSession = async () => {
-    await endSession();
+    await endSession(projectId);
     navigate('/');
   };
 
@@ -46,7 +48,7 @@ const TimerPage = () => {
         </button>
       </div>
 
-      <Timer variant="full" />
+      <Timer projectId={projectId} variant="full" />
     </div>
   );
 };

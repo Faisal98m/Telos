@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../config/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 
 const SessionContext = createContext();
 
@@ -14,66 +14,72 @@ export const useSession = () => {
 };
 
 export const SessionProvider = ({ children }) => {
-  const [activeSession, setActiveSession] = useState(null);
+  const [sessions, setSessions] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
   const userId = "test-user-1";
 
-  // Set up real-time listener for session changes
+  // Set up real-time listener for all project sessions
   useEffect(() => {
-    console.log('SessionProvider: Setting up session listener...');
-    const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
+    console.log('SessionProvider: Setting up sessions listener...');
+    const sessionsRef = collection(db, 'users', userId, 'sessions');
     
-    const unsubscribe = onSnapshot(sessionRef, (snapshot) => {
-      const data = snapshot.data();
-      if (data) {
-        console.log('SessionProvider: Session updated:', data);
-        setActiveSession({
-          ...data,
-          elapsedTime: data.elapsedTime || 0,
-          lastUpdate: data.lastUpdate || data.startTime
-        });
-      } else {
-        console.log('SessionProvider: No active session');
-        setActiveSession(null);
-      }
+    const unsubscribe = onSnapshot(sessionsRef, (snapshot) => {
+      const updatedSessions = {};
+      snapshot.forEach((doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          updatedSessions[doc.id] = {
+            ...data,
+            elapsedTime: data.elapsedTime || 0,
+            lastUpdate: data.lastUpdate || data.startTime || Date.now()
+          };
+        }
+      });
+      setSessions(updatedSessions);
       setIsInitialized(true);
     }, (error) => {
-      console.error('SessionProvider: Error in session listener:', error);
+      console.error('SessionProvider: Error in sessions listener:', error);
       setIsInitialized(true);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Timer update effect
+  // Timer update effect for all running sessions
   useEffect(() => {
-    let intervalId;
+    const intervals = {};
 
-    if (activeSession?.isRunning) {
-      // Update elapsed time every second
-      intervalId = setInterval(async () => {
-        const now = Date.now();
-        const newElapsedTime = activeSession.elapsedTime + (now - activeSession.lastUpdate);
-        
-        setElapsedTime(newElapsedTime);
+    Object.entries(sessions).forEach(([projectId, session]) => {
+      if (session.isRunning) {
+        intervals[projectId] = setInterval(async () => {
+          const now = Date.now();
+          const newElapsedTime = session.elapsedTime + (now - session.lastUpdate);
+          
+          // Update Firebase every 5 seconds to avoid too many writes
+          if (now - session.lastUpdate >= 5000) {
+            const sessionRef = doc(db, 'users', userId, 'sessions', projectId);
+            await setDoc(sessionRef, {
+              ...session,
+              elapsedTime: newElapsedTime,
+              lastUpdate: now
+            }, { merge: true });
+          }
 
-        // Update Firebase every 5 seconds to avoid too many writes
-        if (now - activeSession.lastUpdate >= 5000) {
-          const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
-          await setDoc(sessionRef, {
-            ...activeSession,
-            elapsedTime: newElapsedTime,
-            lastUpdate: now
-          }, { merge: true });
-        }
-      }, 1000);
-    }
+          setSessions(prev => ({
+            ...prev,
+            [projectId]: {
+              ...prev[projectId],
+              elapsedTime: newElapsedTime
+            }
+          }));
+        }, 1000);
+      }
+    });
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      Object.values(intervals).forEach(clearInterval);
     };
-  }, [activeSession]);
+  }, [sessions]);
 
   const startSession = async (projectId, projectName) => {
     console.log('SessionProvider: Starting session for project:', projectId);
@@ -84,12 +90,12 @@ export const SessionProvider = ({ children }) => {
         projectName,
         startTime: now,
         lastUpdate: now,
-        elapsedTime: 0,
+        elapsedTime: sessions[projectId]?.elapsedTime || 0,
         isRunning: true
       };
       
-      const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
-      await setDoc(sessionRef, sessionData);
+      const sessionRef = doc(db, 'users', userId, 'sessions', projectId);
+      await setDoc(sessionRef, sessionData, { merge: true });
       console.log('SessionProvider: Session started successfully');
     } catch (error) {
       console.error('SessionProvider: Error starting session:', error);
@@ -97,17 +103,18 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
-  const pauseSession = async () => {
-    if (!activeSession) return;
+  const pauseSession = async (projectId) => {
+    if (!sessions[projectId]) return;
     
-    console.log('SessionProvider: Pausing session');
+    console.log('SessionProvider: Pausing session:', projectId);
     try {
       const now = Date.now();
-      const newElapsedTime = activeSession.elapsedTime + (now - activeSession.lastUpdate);
+      const session = sessions[projectId];
+      const newElapsedTime = session.elapsedTime + (now - session.lastUpdate);
       
-      const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
+      const sessionRef = doc(db, 'users', userId, 'sessions', projectId);
       await setDoc(sessionRef, {
-        ...activeSession,
+        ...session,
         isRunning: false,
         elapsedTime: newElapsedTime,
         lastUpdate: now
@@ -120,15 +127,17 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
-  const resumeSession = async () => {
-    if (!activeSession) return;
+  const resumeSession = async (projectId) => {
+    if (!sessions[projectId]) return;
     
-    console.log('SessionProvider: Resuming session');
+    console.log('SessionProvider: Resuming session:', projectId);
     try {
       const now = Date.now();
-      const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
+      const session = sessions[projectId];
+      
+      const sessionRef = doc(db, 'users', userId, 'sessions', projectId);
       await setDoc(sessionRef, {
-        ...activeSession,
+        ...session,
         isRunning: true,
         lastUpdate: now
       }, { merge: true });
@@ -140,18 +149,19 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
-  const endSession = async () => {
-    if (!activeSession) return;
+  const endSession = async (projectId) => {
+    if (!sessions[projectId]) return;
     
-    console.log('SessionProvider: Ending session');
+    console.log('SessionProvider: Ending session:', projectId);
     try {
       // Save final elapsed time to project
       const now = Date.now();
-      const finalElapsedTime = activeSession.elapsedTime + (activeSession.isRunning ? (now - activeSession.lastUpdate) : 0);
+      const session = sessions[projectId];
+      const finalElapsedTime = session.elapsedTime + (session.isRunning ? (now - session.lastUpdate) : 0);
       const hoursCompleted = Math.floor(finalElapsedTime / 3600000); // Convert ms to hours
       
       if (hoursCompleted > 0) {
-        const projectRef = doc(db, 'users', userId, 'projects', activeSession.projectId);
+        const projectRef = doc(db, 'users', userId, 'projects', projectId);
         const projectSnap = await getDoc(projectRef);
         if (projectSnap.exists()) {
           const currentHours = projectSnap.data().completedHours || 0;
@@ -162,9 +172,16 @@ export const SessionProvider = ({ children }) => {
         }
       }
 
-      // Clear active session
-      const sessionRef = doc(db, 'users', userId, 'activeSession', 'current');
-      await setDoc(sessionRef, null);
+      // Clear session data but keep elapsed time
+      const sessionRef = doc(db, 'users', userId, 'sessions', projectId);
+      await setDoc(sessionRef, {
+        projectId,
+        projectName: session.projectName,
+        elapsedTime: finalElapsedTime,
+        isRunning: false,
+        lastUpdate: now
+      }, { merge: true });
+      
       console.log('SessionProvider: Session ended successfully');
     } catch (error) {
       console.error('SessionProvider: Error ending session:', error);
@@ -179,8 +196,7 @@ export const SessionProvider = ({ children }) => {
 
   return (
     <SessionContext.Provider value={{ 
-      activeSession,
-      elapsedTime,
+      sessions,
       startSession,
       pauseSession,
       resumeSession,

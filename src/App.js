@@ -44,7 +44,7 @@ function App() {
               element={<Dashboard />} 
             />
             <Route 
-              path="/timer" 
+              path="/timer/:projectId" 
               element={<TimerPage />} 
             />
             <Route 

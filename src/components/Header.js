@@ -4,8 +4,11 @@ import { useSession } from '../context/SessionContext';
 import './Header.css';
 
 const Header = () => {
-  const { activeSession } = useSession();
+  const { sessions } = useSession();
   const navigate = useNavigate();
+
+  // Find the first running session
+  const activeSession = Object.values(sessions).find(session => session.isRunning);
 
   console.log('Header: Rendering with active session:', activeSession);
 
@@ -18,7 +21,7 @@ const Header = () => {
         {activeSession && (
           <div 
             className="session-status"
-            onClick={() => navigate('/timer')}
+            onClick={() => navigate(`/timer/${activeSession.projectId}`)}
             role="button"
             tabIndex={0}
           >

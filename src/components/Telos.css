@@ -1,7 +1,72 @@
 .telos-container {
-    padding: 20px;
-    border: 1px solid #ddd;
-    margin: 20px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-  }
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #111111, #1a1a1a);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.telos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.project-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #64DCFF, #64FFB5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.back-button,
+.end-button,
+.start-button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
+}
+
+.start-button {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.end-button {
+  background: linear-gradient(135deg, #ff5252, #ff1744);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 23, 68, 0.3);
+}
+
+.end-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 23, 68, 0.4);
+}
