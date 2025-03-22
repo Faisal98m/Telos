@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../config/firebase';
-import { collection, getDocs, addDoc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, addDoc, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { useSession } from '../context/SessionContext';
 import { initializeUserData } from '../utils/firebaseInit';
 import TelosTile from './TelosTile';
@@ -32,7 +32,7 @@ const Dashboard = () => {
           const projectsData = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-          }));
+          })).sort((a, b) => b.createdAt - a.createdAt); // Sort by creation date, newest first
           console.log('Dashboard: Projects data:', projectsData);
           setProjects(projectsData);
 
@@ -70,13 +70,28 @@ const Dashboard = () => {
     try {
       console.log('Dashboard: Adding new Telos...');
       const projectsRef = collection(db, 'users', userId, 'projects');
+      
+      // Create new project
       const newProject = {
         name: `New Telos ${projects.length + 1}`,
         completedHours: 0,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        lastModified: Date.now()
       };
-      await addDoc(projectsRef, newProject);
-      console.log('Dashboard: New Telos added successfully');
+      
+      // Add the project and get its ID
+      const projectDoc = await addDoc(projectsRef, newProject);
+      console.log('Dashboard: New Telos added successfully with ID:', projectDoc.id);
+      
+      // Initialize the first hour block with an empty note
+      const firstHourRef = doc(db, 'users', userId, 'projects', projectDoc.id, 'notes', '1');
+      await setDoc(firstHourRef, { 
+        text: '',
+        createdAt: Date.now(),
+        lastModified: Date.now()
+      });
+      console.log('Dashboard: First hour block initialized for notes');
+      
     } catch (error) {
       console.error('Dashboard: Error adding new Telos:', error);
       setError(error.message);
@@ -114,16 +129,17 @@ const Dashboard = () => {
           <TelosTile
             key={project.id}
             project={project}
-            totalHours={project.completedHours}
           />
         ))}
-        <button 
-          className="add-telos-tile"
-          onClick={handleAddTelos}
-        >
-          <span className="plus">+</span>
-          <span>Add Telos</span>
-        </button>
+        <div className="add-telos-wrapper">
+          <button 
+            className="add-telos-tile"
+            onClick={handleAddTelos}
+          >
+            <span className="plus">+</span>
+            <span>Add Telos</span>
+          </button>
+        </div>
       </div>
     </div>
   );

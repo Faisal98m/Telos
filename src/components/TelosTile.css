@@ -1,82 +1,168 @@
-.telos-tile {
-  background: #1a1a1a;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
-  cursor: pointer;
+.telos-tile-container {
   position: relative;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  min-width: 350px;
+}
+
+.telos-tile {
+  background: rgba(30, 30, 35, 0.95);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  min-height: 250px;
+  position: relative;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
+}
+
+.tile-content-wrapper {
+  position: relative;
+  z-index: 10;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.telos-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.telos-tile.active {
-  border-color: rgba(100, 220, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(100, 220, 255, 0.15),
-              inset 0 0 32px rgba(100, 220, 255, 0.05);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 8px 32px rgba(100, 220, 255, 0.15),
-                inset 0 0 32px rgba(100, 220, 255, 0.05);
-  }
-  50% {
-    box-shadow: 0 8px 32px rgba(100, 220, 255, 0.25),
-                inset 0 0 32px rgba(100, 220, 255, 0.1);
-  }
-  100% {
-    box-shadow: 0 8px 32px rgba(100, 220, 255, 0.15),
-                inset 0 0 32px rgba(100, 220, 255, 0.05);
-  }
-}
-
+/* Header Section - 1/4 */
 .tile-header {
+  flex: 1;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
+  width: 100%;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .project-name {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .progress-info {
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
 }
 
 .hours {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #ffffff;
 }
 
 .total {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.tile-content {
+/* Image Section - 2/4 */
+.image-section {
+  flex: 2;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.image-controls {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-menu-button {
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-menu-button:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(1.1);
+}
+
+.button-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.image-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: rgba(35, 35, 40, 0.95);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+}
+
+.image-option {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.image-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.image-option + .image-option {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Controls Section - 1/4 */
+.controls-section {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .session-controls {
@@ -86,111 +172,148 @@
   width: 100%;
 }
 
-.start-button,
-.end-button {
-  padding: 0.6rem 1.2rem;
+.telos-start-button,
+.telos-end-button {
+  padding: 1rem 2rem;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  backdrop-filter: blur(4px);
 }
 
-.start-button {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  color: white;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+.telos-start-button {
+  background: rgba(176, 86, 33, 0.9);
+  color: #ffffff;
   width: 100%;
 }
 
-.start-button:hover {
+.telos-start-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+  background: rgba(7, 171, 10, 0.9);
+  box-shadow: 0 4px 12px rgba(7, 171, 10, 0.3);
 }
 
-.end-button {
-  background: linear-gradient(135deg, #ff5252, #ff1744);
+.telos-end-button {
+  background: rgba(255, 82, 82, 0.9);
   color: white;
-  box-shadow: 0 4px 12px rgba(255, 23, 68, 0.3);
-  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(255, 82, 82, 0.2);
 }
 
-.end-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 23, 68, 0.4);
+.mini-timer {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.mini-time-display {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.mini-control-button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.mini-control-button.start {
+  background: #64DCFF;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.mini-control-button.play {
+  background: #4CAF50;
+  color: white;
+}
+
+.mini-control-button.pause {
+  background: #FF9800;
+  color: white;
+}
+
+.mini-control-button:hover {
+  transform: scale(1.1);
 }
 
 .progress-bar {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  right: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0 0 16px 16px;
   overflow: hidden;
+  z-index: 1;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(to right, #64DCFF, #64FFB5);
+  background: linear-gradient(90deg, #c71328, #48e197);
   transition: width 0.3s ease;
+  opacity: 0.8;
 }
 
-.tile-image {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.tile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.tile-image:hover img {
-  transform: scale(1.05);
-}
-
-.image-overlay {
+.tile-background-image {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+  opacity: 0.2;
 }
 
-.tile-image:hover .image-overlay {
-  opacity: 1;
+.tile-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(30, 30, 35, 0.95) 0%,
+    rgba(30, 30, 35, 0.98) 100%
+  );
+  z-index: 2;
 }
 
-.upload-icon {
-  font-size: 2rem;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+.telos-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    0 3px 6px rgba(0, 0, 0, 0.1);
+  border-color: #191c1d;
 }
 
-.tile-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-}
-
-.status-text {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
+.telos-tile.active {
+  background: rgba(35, 35, 40, 0.95);
+  border-color: #8b9193;
+  box-shadow: 
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    0 0 0 2px rgba(100, 220, 255, 0.3);
 }

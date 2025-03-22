@@ -13,38 +13,63 @@ const Telos = ({ userId }) => {
   const { sessions, startSession, endSession } = useSession();
   const [project, setProject] = useState(null);
   const [expandedBlock, setExpandedBlock] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Handle navigation when projectId or project is missing
+  useEffect(() => {
+    if (!isLoading && (!projectId || !project)) {
+      console.log('Telos: Invalid project state, redirecting to dashboard');
+      navigate('/');
+    }
+  }, [projectId, project, isLoading, navigate]);
 
   // Load and sync project data
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId) {
+      setIsLoading(false);
+      return;
+    }
     
     const projectRef = doc(db, 'users', userId, 'projects', projectId);
+    console.log('Telos: Loading project data for', projectId);
 
     const loadData = async () => {
-      const docSnap = await getDoc(projectRef);
-      if (docSnap.exists()) {
-        setProject(docSnap.data());
-      } else {
-        // Initialize new project with default values
-        const newProject = {
-          name: 'New Telos',
-          completedHours: 0,
-          createdAt: new Date().toISOString(),
-          lastModified: new Date().toISOString()
-        };
-        await setDoc(projectRef, newProject);
-        setProject(newProject);
+      try {
+        const docSnap = await getDoc(projectRef);
+        if (docSnap.exists()) {
+          console.log('Telos: Project data loaded:', docSnap.data());
+          setProject(docSnap.data());
+        } else {
+          console.log('Telos: Initializing new project');
+          // Initialize new project with default values
+          const newProject = {
+            name: 'New Telos',
+            completedHours: 0,
+            createdAt: Date.now(),
+            lastModified: Date.now()
+          };
+          await setDoc(projectRef, newProject);
+          setProject(newProject);
+        }
+      } catch (error) {
+        console.error('Telos: Error loading project:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadData();
 
     const unsubscribe = onSnapshot(projectRef, (docSnap) => {
       if (docSnap.exists()) {
+        console.log('Telos: Project update received:', docSnap.data());
         setProject(docSnap.data());
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('Telos: Cleaning up project listener');
+      unsubscribe();
+    };
   }, [userId, projectId]);
 
   const handleBlockClick = (blockId) => {
@@ -59,14 +84,17 @@ const Telos = ({ userId }) => {
     navigate(`/notes/${projectId}/${hour}`);
   };
 
-  if (!projectId || !project) {
-    navigate('/');
-    return null;
-  }
-
   const handleStartSession = () => {
     startSession(projectId, project.name);
   };
+
+  if (isLoading) {
+    return <div className="loading">Loading project details...</div>;
+  }
+
+  if (!projectId || !project) {
+    return null;
+  }
 
   return (
     <div className="telos-container">

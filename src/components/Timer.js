@@ -3,6 +3,9 @@ import { useSession } from '../context/SessionContext';
 import { formatTime } from '../utils/timeUtils';
 import './Timer.css';
 
+const HOUR_IN_MS = 3600000; // 1 hour in milliseconds
+const TOTAL_TIME = HOUR_IN_MS * 1000; // 1000 hours in milliseconds
+
 const Timer = ({ projectId, variant = 'full', onStart }) => {
   const { 
     sessions,
@@ -12,15 +15,15 @@ const Timer = ({ projectId, variant = 'full', onStart }) => {
 
   const session = sessions[projectId];
   const isActive = !!session;
-  const timeRemaining = isActive 
-    ? Math.max(0, 3600000000 - session.elapsedTime) 
-    : 3600000000; // 1000 hours in ms
-  const completedHours = isActive 
-    ? Math.floor(session.elapsedTime / 3600000) 
-    : 0; // Convert ms to hours
-  const hourProgress = isActive 
-    ? ((3600000 - (timeRemaining % 3600000)) / 3600000) * 100 
-    : 0;
+
+  // Calculate elapsed time and remaining time
+  const elapsed = isActive ? session.elapsedTime : 0;
+  const remaining = Math.max(0, TOTAL_TIME - elapsed);
+  const completedHours = Math.floor(elapsed / HOUR_IN_MS);
+
+  // Calculate progress within current hour (0-100%)
+  const currentHourElapsed = elapsed % HOUR_IN_MS;
+  const hourProgress = (currentHourElapsed / HOUR_IN_MS) * 100;
 
   const handleToggleTimer = async () => {
     if (!isActive) {
@@ -40,7 +43,7 @@ const Timer = ({ projectId, variant = 'full', onStart }) => {
     return (
       <div className="mini-timer">
         <div className="mini-time-display">
-          {formatTime(timeRemaining)}
+          {formatTime(remaining)}
         </div>
         <button 
           className={`mini-control-button ${isActive ? (session.isRunning ? 'pause' : 'play') : 'start'}`} 
@@ -64,7 +67,7 @@ const Timer = ({ projectId, variant = 'full', onStart }) => {
         </div>
         
         <div className="time-display">
-          <div className="time-value">{formatTime(timeRemaining)}</div>
+          <div className="time-value">{formatTime(remaining)}</div>
           <div className="hours-completed">{completedHours} / 1000 hours</div>
         </div>
 
